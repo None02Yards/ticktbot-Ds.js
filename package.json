@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
 "scripts": {
+  "deploy": "ts-node src/deploy-commands.ts",
    "dev":    "ts-node src/index.ts",
      "bot": "ts-node src/index.ts",
-  "deploy": "ts-node src/delpoy-commands.ts",
   "build": "tsc",
   "start": "node dist/bot.js"
 }
