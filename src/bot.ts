@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { Client, GatewayIntentBits, Events, ChatInputCommandInteraction } from 'discord.js';
 import { config } from './config';
 import { loadCommands, Command } from './loadCommands';
+import { loadEvents } from './loadEvents'; 
 
 export const client = new Client({
   intents: [
@@ -32,16 +33,30 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 });
 
+
 export async function startBot() {
   const commands = await loadCommands();
   for (const command of commands) {
     commandMap.set(command.data.name, command);
   }
+
+  await loadEvents(client); 
+
   await client.login(config.token);
 }
-if (require.main === module) {
-  startBot().catch(err => {
-    console.error('Failed to start bot:', err);
-    process.exit(1);
-  });
-}
+
+
+// export async function startBot() {
+//   const commands = await loadCommands();
+//   for (const command of commands) {
+//     commandMap.set(command.data.name, command);
+//   }
+//   await client.login(config.token);
+// }
+// if (require.main === module) {
+//   startBot().catch(err => {
+//     console.error('Failed to start bot:', err);
+//     process.exit(1);
+//   });
+// }
+

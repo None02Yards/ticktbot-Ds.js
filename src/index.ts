@@ -22,6 +22,7 @@
 // });
 
 // client.login(config.token);
+// index.ts
 import { startBot } from './bot';
 
 startBot();
