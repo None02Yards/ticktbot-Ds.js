@@ -1,0 +1,27 @@
+{
+  "name": "ticktdiscord",
+  "version": "1.0.0",
+  "main": "index.js",
+"scripts": {
+   "dev":    "ts-node src/index.ts",
+     "bot": "ts-node src/index.ts",
+  "deploy": "ts-node src/delpoy-commands.ts",
+  "build": "tsc",
+  "start": "node dist/bot.js"
+}
+,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "discord.js": "^14.21.0",
+    "dotenv": "^16.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+
+}
