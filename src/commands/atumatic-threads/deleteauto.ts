@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export const deleteCommand = {
   data: new SlashCommandBuilder()
-    .setName('delete')
+    .setName('delete-thread')
     .setDescription('Delete the current thread'),
 
   async execute(interaction: ChatInputCommandInteraction) {

@@ -19,7 +19,6 @@ async function walkDir(dir: string, commands: Command[]): Promise<void> {
     if (stats.isDirectory()) {
       await walkDir(fullPath, commands);
     } else if (entry.endsWith('.ts') || entry.endsWith('.js')) {
-      // Compute the module path relative to this file
       const relativePath = path
         .relative(__dirname, fullPath)
         .replace(/\\/g, '/')
@@ -27,10 +26,8 @@ async function walkDir(dir: string, commands: Command[]): Promise<void> {
 
       try {
         const mod = await import(`./${relativePath}`);
-        // Assume the command export is the first value in the module
         const cmd = (Object.values(mod)[0]) as Command;
 
-        // Validate shape before pushing
         if (
           cmd &&
           cmd.data instanceof SlashCommandBuilder &&
@@ -46,24 +43,37 @@ async function walkDir(dir: string, commands: Command[]): Promise<void> {
 }
 
 /**
- * Loads all commands under src/commands/** and returns them.
+ * Loads all commands under src/commands/** and returns unique commands.
  */
 export async function loadCommands(): Promise<Command[]> {
-  const commands: Command[] = [];
+  const allCommands: Command[] = [];
   const commandsPath = path.join(__dirname, 'commands');
-  await walkDir(commandsPath, commands);
-  return commands;
+  await walkDir(commandsPath, allCommands);
+
+  const uniqueCommands: Command[] = [];
+  const commandNames = new Set<string>();
+
+  for (const cmd of allCommands) {
+    if (commandNames.has(cmd.data.name)) {
+      console.warn(`Duplicate command name skipped: ${cmd.data.name}`);
+      continue; // skip duplicate
+    }
+    commandNames.add(cmd.data.name);
+    uniqueCommands.push(cmd);
+  }
+
+  return uniqueCommands;
 }
 
 /**
- * Registers all loaded commands with Discord via the REST API.
+ * Registers all unique commands with Discord via the REST API.
  */
 export async function registerCommands(): Promise<void> {
   const commands = await loadCommands();
   const rest = new REST({ version: '10' }).setToken(config.token);
 
   try {
-    console.log(`📦 Registering ${commands.length} slash commands...`);
+    console.log(`📦 Registering ${commands.length} unique slash commands...`);
     await rest.put(
       Routes.applicationGuildCommands(config.clientId, config.guildId),
       { body: commands.map(cmd => cmd.data.toJSON()) }
@@ -72,4 +82,6 @@ export async function registerCommands(): Promise<void> {
   } catch (err) {
     console.error('❌ Slash command registration failed:', err);
   }
+
+  console.log('Loaded commands:', commands.map(cmd => cmd.data.name));
 }

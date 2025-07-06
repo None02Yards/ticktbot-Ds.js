@@ -5,7 +5,7 @@ import {
 
 export const renameTitleCommand = {
   data: new SlashCommandBuilder()
-    .setName('rename-title')
+    .setName('rename-title-thread')
     .setDescription('Rename the current thread title')
     .addStringOption(option =>
       option

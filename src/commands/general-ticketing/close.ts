@@ -1,56 +1,26 @@
-import {
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-  TextChannel,
-  ThreadChannel,
-  GuildMember,
-} from 'discord.js';
-import { config } from '../../config';
+// src/commands/general-ticketing/close.ts
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-export const closeTicketCommand = {
+export const closeCommand = {
   data: new SlashCommandBuilder()
-    .setName('close-ticket')
-    .setDescription('Close your active ticket thread'),
+    .setName('close')
+    .setDescription('Archive the current ticket thread'),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    const user = interaction.user;
-    const guild = interaction.guild;
-    const channel = guild?.channels.cache.get(config.ticketChannelId);
-
-    if (!channel || !channel.isTextBased()) {
-      return interaction.reply({
-        content: '❌ Ticket channel is invalid or missing.',
-        ephemeral: true,
-      });
+    const thread = interaction.channel;
+    if (!thread?.isThread()) {
+      return interaction.reply({ content: '❌ This command must be used inside a ticket thread.', ephemeral: true });
     }
 
-    // Try to find an open thread by user
-    const textChannel = channel as TextChannel;
-    const userThread = textChannel.threads.cache.find(
-      (t) =>
-        t.name.includes(user.username) &&
-        !t.archived
-    );
-
-    if (!userThread) {
-      return interaction.reply({
-        content: '⚠️ No open ticket thread found for you.',
-        ephemeral: true,
-      });
+    if (thread.archived) {
+      return interaction.reply({ content: '⚠️ This thread is already archived.', ephemeral: true });
     }
 
     try {
-      await userThread.setArchived(true, 'Closed by user via /close-ticket');
-      await interaction.reply({
-        content: `✅ Your ticket thread <#${userThread.id}> has been archived.`,
-        ephemeral: true,
-      });
-    } catch (err) {
-      console.error('Failed to close ticket thread:', err);
-      await interaction.reply({
-        content: '❌ Failed to archive your ticket.',
-        ephemeral: true,
-      });
+      await thread.setArchived(true, 'Archived via /close command');
+      await interaction.reply({ content: '📌 Ticket thread has been archived.', ephemeral: true });
+    } catch {
+      await interaction.reply({ content: '❌ Failed to archive the thread.', ephemeral: true });
     }
   },
 };

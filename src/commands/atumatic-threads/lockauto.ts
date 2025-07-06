@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-export const closeCommand = {
+export const lockCommand = {
   data: new SlashCommandBuilder()
-    .setName('close')
-    .setDescription('Archive the current thread'),
+    .setName('lock-thread')
+    .setDescription('Lock the current thread (make it read-only)'),
 
   async execute(interaction: ChatInputCommandInteraction) {
     const thread = interaction.channel;
@@ -16,22 +16,23 @@ export const closeCommand = {
     }
 
     try {
-      if (thread.archived) {
+      if (thread.locked) {
         return interaction.reply({
-          content: '⚠️ This thread is already archived.',
+          content: '⚠️ This thread is already locked.',
           ephemeral: true,
         });
       }
 
-      await thread.setArchived(true, 'Closed by user command');
+      await thread.setLocked(true, 'Locked via /lock command');
+
       await interaction.reply({
-        content: '✅ Thread has been archived.',
+        content: '🔒 Thread has been locked (read-only).',
         ephemeral: true,
       });
     } catch (err) {
-      console.error('Failed to archive thread:', err);
+      console.error('Failed to lock thread:', err);
       await interaction.reply({
-        content: '❌ Could not archive the thread.',
+        content: '❌ Could not lock the thread.',
         ephemeral: true,
       });
     }
