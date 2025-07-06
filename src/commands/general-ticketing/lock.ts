@@ -1,53 +1,26 @@
-import {
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-  TextChannel,
-} from 'discord.js';
-import { config } from '../../config';
+// src/commands/general-ticketing/lock.ts
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-export const lockTicketCommand = {
+export const lockCommand = {
   data: new SlashCommandBuilder()
-    .setName('lock-ticket')
-    .setDescription('Lock your open ticket thread (read-only)'),
+    .setName('lock')
+    .setDescription('Lock the current ticket thread'),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    const user = interaction.user;
-    const guild = interaction.guild;
-    const channel = guild?.channels.cache.get(config.ticketChannelId);
-
-    if (!channel || !channel.isTextBased()) {
-      return interaction.reply({
-        content: '❌ Ticket channel is invalid or missing.',
-        ephemeral: true,
-      });
+    const thread = interaction.channel;
+    if (!thread?.isThread()) {
+      return interaction.reply({ content: '❌ This command must be used inside a ticket thread.', ephemeral: true });
     }
 
-    const textChannel = channel as TextChannel;
-    const userThread = textChannel.threads.cache.find(
-      (t) =>
-        t.name.includes(user.username) &&
-        !t.locked
-    );
-
-    if (!userThread) {
-      return interaction.reply({
-        content: '⚠️ No open unlocked thread found for you.',
-        ephemeral: true,
-      });
+    if (thread.locked) {
+      return interaction.reply({ content: '⚠️ This thread is already locked.', ephemeral: true });
     }
 
     try {
-      await userThread.setLocked(true, 'Locked via /lock-ticket');
-      await interaction.reply({
-        content: `🔒 Ticket thread <#${userThread.id}> has been locked.`,
-        ephemeral: true,
-      });
-    } catch (err) {
-      console.error('Failed to lock ticket thread:', err);
-      await interaction.reply({
-        content: '❌ Failed to lock your ticket.',
-        ephemeral: true,
-      });
+      await thread.setLocked(true, 'Locked via /lock command');
+      await interaction.reply({ content: '🔒 Ticket thread has been locked.', ephemeral: true });
+    } catch {
+      await interaction.reply({ content: '❌ Failed to lock the thread.', ephemeral: true });
     }
   },
 };

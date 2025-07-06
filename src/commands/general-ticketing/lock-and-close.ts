@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, TextChannel } from 'discord.js';
+// src/commands/general-ticketing/lock-and-close-ticket.ts
+import { ChatInputCommandInteraction, SlashCommandBuilder, TextChannel, ThreadChannel } from 'discord.js';
 import { config } from '../../config';
 
 export const lockAndCloseTicketCommand = {
@@ -10,9 +11,13 @@ export const lockAndCloseTicketCommand = {
     const user = interaction.user;
     const channel = interaction.guild?.channels.cache.get(config.ticketChannelId) as TextChannel;
 
-    const thread = channel?.threads.cache.find(
+    if (!channel) {
+      return interaction.reply({ content: '⚠️ Ticket category channel not found.', ephemeral: true });
+    }
+
+    const thread = channel.threads.cache.find(
       (t) => t.name.includes(user.username) && (!t.locked || !t.archived)
-    );
+    ) as ThreadChannel | undefined;
 
     if (!thread) {
       return interaction.reply({ content: '⚠️ No eligible ticket found.', ephemeral: true });

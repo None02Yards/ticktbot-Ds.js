@@ -1,3 +1,5 @@
+
+// /media/right/New Volume/ticktdiscord/src/commands/general-ticketing/rename-title.ts
 import { ChatInputCommandInteraction, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { config } from '../../config';
 

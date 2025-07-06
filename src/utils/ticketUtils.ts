@@ -1,3 +1,4 @@
+// src/utils/ticketUtils.ts
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -6,8 +7,6 @@ import {
   ThreadChannel,
 } from 'discord.js';
 
-/**
- */
 export async function postTicketIntro(
   thread: ThreadChannel,
   userTag: string,
@@ -34,6 +33,14 @@ export async function postTicketIntro(
       .setCustomId('close-ticket')
       .setLabel('📁 Close')
       .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId('delete-ticket')
+      .setLabel('🗑️ Delete')
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId('rename-ticket')
+      .setLabel('✏️ Rename')
+      .setStyle(ButtonStyle.Secondary),
   );
 
   await thread.send({ embeds: [embed], components: [actions] });
