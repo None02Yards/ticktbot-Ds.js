@@ -1,5 +1,6 @@
 // src/commands/general-ticketing/close.ts
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { closeThread } from '../../utils/ticketActions';
 
 export const closeCommand = {
   data: new SlashCommandBuilder()
@@ -9,18 +10,23 @@ export const closeCommand = {
   async execute(interaction: ChatInputCommandInteraction) {
     const thread = interaction.channel;
     if (!thread?.isThread()) {
-      return interaction.reply({ content: '❌ This command must be used inside a ticket thread.', ephemeral: true });
-    }
-
-    if (thread.archived) {
-      return interaction.reply({ content: '⚠️ This thread is already archived.', ephemeral: true });
+      return interaction.reply({
+        content: '❌ This command must be used inside a ticket thread.',
+        ephemeral: true,
+      });
     }
 
     try {
-      await thread.setArchived(true, 'Archived via /close command');
-      await interaction.reply({ content: '📌 Ticket thread has been archived.', ephemeral: true });
-    } catch {
-      await interaction.reply({ content: '❌ Failed to archive the thread.', ephemeral: true });
+      await closeThread(thread, interaction.user.tag);
+      await interaction.reply({
+        content: '📁 Thread archived.',
+        ephemeral: true,
+      });
+    } catch (err: any) {
+      await interaction.reply({
+        content: `❌ ${err.message}`,
+        ephemeral: true,
+      });
     }
   },
 };

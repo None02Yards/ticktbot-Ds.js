@@ -1,5 +1,6 @@
 // src/commands/general-ticketing/lock.ts
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { lockThread } from '../../utils/ticketActions';
 
 export const lockCommand = {
   data: new SlashCommandBuilder()
@@ -9,18 +10,23 @@ export const lockCommand = {
   async execute(interaction: ChatInputCommandInteraction) {
     const thread = interaction.channel;
     if (!thread?.isThread()) {
-      return interaction.reply({ content: '❌ This command must be used inside a ticket thread.', ephemeral: true });
-    }
-
-    if (thread.locked) {
-      return interaction.reply({ content: '⚠️ This thread is already locked.', ephemeral: true });
+      return interaction.reply({
+        content: '❌ This command must be used inside a ticket thread.',
+        ephemeral: true,
+      });
     }
 
     try {
-      await thread.setLocked(true, 'Locked via /lock command');
-      await interaction.reply({ content: '🔒 Ticket thread has been locked.', ephemeral: true });
-    } catch {
-      await interaction.reply({ content: '❌ Failed to lock the thread.', ephemeral: true });
+      await lockThread(thread, interaction.user.tag);
+      await interaction.reply({
+        content: '🔒 Thread locked.',
+        ephemeral: true,
+      });
+    } catch (err: any) {
+      await interaction.reply({
+        content: `❌ ${err.message}`,
+        ephemeral: true,
+      });
     }
   },
 };
