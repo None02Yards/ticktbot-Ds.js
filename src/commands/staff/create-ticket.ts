@@ -8,51 +8,34 @@ import {
 } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('create-ticket')
-  .setDescription('Open the ticket creation menu');
+  .setName('ticket')
+  .setDescription('Create a ticket (normal or threaded)');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const select = new StringSelectMenuBuilder()
-    .setCustomId('ticketTypeSelector')
-    .setPlaceholder('Select the type of ticket to create...')
+    .setCustomId('ticketTypePrimarySelector')
+    .setPlaceholder('Choose ticket type')
     .addOptions(
       {
-        label: 'Report NSFW Content',
-        value: 'report_nsfw',
-        description: 'Choose this option if your ticket involves anything 18+',
-        emoji: '🔞',
+        label: 'Normal Ticket',
+        description: 'Create a single message ticket (no thread)',
+        value: 'normal_ticket',
+        emoji: '📩',
       },
       {
-        label: 'Member Reports',
-        value: 'member_report',
-        description: 'Report a server member (They must be in the server!)',
-        emoji: '📛',
-      },
-      {
-        label: 'Server Inquiries',
-        value: 'server_inquiry',
-        description: 'Ask a question about the server',
-        emoji: '❓',
-      },
-      {
-        label: 'Moderation Appeals',
-        value: 'mod_appeal',
-        description: 'Have a warning you want to appeal? Click me',
-        emoji: '👮‍♂️',
-      },
-      {
-        label: 'Contact NTTS',
-        value: 'contact_ntts',
-        description: 'Private video ideas, important stuff.',
-        emoji: '🧠',
+        label: 'Threaded Ticket',
+        description: 'Create a ticket as a private thread',
+        value: 'threaded_ticket',
+        emoji: '🧵',
       }
     );
 
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
 
   await interaction.reply({
-    content: '**Contact the Staff Team**\n\nUsing the drop down below, select the option you believe fits your concern.',
+    content: 'Select the type of ticket you want to create:',
     components: [row],
     ephemeral: true,
   });
 }
+

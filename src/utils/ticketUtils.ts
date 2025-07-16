@@ -1,3 +1,5 @@
+
+
 // src/utils/ticketUtils.ts
 import {
   EmbedBuilder,
@@ -17,7 +19,7 @@ export async function postTicketIntro(
     .setTitle(`🎫 Ticket #${ticketId.toString().padStart(4, '0')}`)
     .setDescription(`**User:** ${userTag}\n**Reason:** ${reason}`)
     .addFields(
-      { name: 'Status',  value: '🟢 Open', inline: true },
+      { name: 'Status', value: '🟢 Open', inline: true },
       { name: 'Created', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
     )
     .setColor(0x00AE86)
